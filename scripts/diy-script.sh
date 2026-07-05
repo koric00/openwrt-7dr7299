@@ -35,6 +35,17 @@ clone_if_missing https://github.com/Openwrt-Passwall/openwrt-passwall-packages "
 clone_if_missing https://github.com/Openwrt-Passwall/openwrt-passwall  ""     package/passwall-luci
 clone_if_missing https://github.com/EasyTier/luci-app-easytier.git     ""     package/luci-app-easytier
 
+# ===== koric00 增补: OpenClash(养猫) + iStore 应用商店 =====
+# OpenClash —— 可直接导入现有 clash/mihomo 配置/订阅
+clone_if_missing https://github.com/vernesong/OpenClash "" package/OpenClash
+
+# iStore 应用商店 —— feed 方式自动拉全依赖(taskd/xterm 等);失败不阻断编译
+if ! grep -q "src-git istore" feeds.conf.default 2>/dev/null; then
+  echo "src-git istore https://github.com/linkease/istore;main" >> feeds.conf.default
+fi
+( ./scripts/feeds update istore && ./scripts/feeds install -d y -f -p istore luci-app-store ) \
+  || echo "[diy] iStore 安装失败,跳过(不阻断编译)"
+
 
 # 修改版本为编译日期
 DATE_VERSION="$(date +%Y.%m.%d)"
